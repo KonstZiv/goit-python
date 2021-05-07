@@ -134,7 +134,7 @@ def unzip_archives(path):
 
     for elem in (path / 'archives').iterdir():
         #print(f'просматриваю файл - {elem.name}')
-        # print(elem.suffix)
+        #print(elem.suffix)
         if elem.suffix[1:] in available_arch_type:
             print(
                 f'найден архив доступного для обработки формата: {elem.name}')
@@ -142,12 +142,14 @@ def unzip_archives(path):
             print('архив разархивирован')
 
 
-def main():
+if __name__ == '__main__':
+    # text = input('введите текст: ')
+    # print(normalize(text))
     if len(sys.argv) < 2:
         path_str = os.getcwd()
     else:
         path_str = sys.argv[1]
-
+    
     print(f'будет обработана папка {path_str}')
     print('в ходе обработки файлы будут отсортированы по новым папкам, кирилические символы ')
     print('будут заменены на латиницу, старая структура папок внутри указанной Вами будет уничтожена')
@@ -166,9 +168,4 @@ def main():
 
         else:
             print(f'path {path.absolute()} not exist')
-
     print('работа скрипта завершена')
-
-
-if __name__ == '__main__':
-    main()
