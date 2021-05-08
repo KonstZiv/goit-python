@@ -111,17 +111,17 @@ def delete_empty_folder(sort_dict_full, path):
     """вытирает вложенные в path пустые папки, если это не папки c именами ключей словаря sort_dict_full"""
     for elem in path.iterdir():
         if elem.is_dir() and not (elem.name in set(sort_dict_full)):
-            #print(f'папка {elem.name}, надо уничтожать')
+            # print(f'папка {elem.name}, надо уничтожать')
             if (not bool(sorted(elem.rglob('*')))):
                # print(f'папка {elem.name} пустая')
                 elem.rmdir()
-                #print(f'папка {elem.name} уничтожена')
+                # print(f'папка {elem.name} уничтожена')
             else:
-                #print(f"папка {elem.name} не пустая, в ней {elem.rglob('*')}")
+                # print(f"папка {elem.name} не пустая, в ней {elem.rglob('*')}")
                 delete_empty_folder(sort_dict_full, elem)
-                #print('вернулись из рекурсивного вызова')
+                # print('вернулись из рекурсивного вызова')
                 elem.rmdir()
-                #print(f'папка {elem.name} уничтожена')
+                # print(f'папка {elem.name} уничтожена')
 
 
 def unzip_archives(path):
@@ -130,11 +130,11 @@ def unzip_archives(path):
     available_arch_type = set()
     for elem in shutil.get_archive_formats():
         available_arch_type.add(elem[0])
-    #print('доступные форматы: ', available_arch_type)
+    # print('доступные форматы: ', available_arch_type)
 
     for elem in (path / 'archives').iterdir():
-        #print(f'просматриваю файл - {elem.name}')
-        #print(elem.suffix)
+        # print(f'просматриваю файл - {elem.name}')
+        # print(elem.suffix)
         if elem.suffix[1:] in available_arch_type:
             print(
                 f'найден архив доступного для обработки формата: {elem.name}')
@@ -142,16 +142,15 @@ def unzip_archives(path):
             print('архив разархивирован')
 
 
-if __name__ == '__main__':
-    # text = input('введите текст: ')
-    # print(normalize(text))
+def main():
+
     if len(sys.argv) < 2:
         path_str = os.getcwd()
     else:
         path_str = sys.argv[1]
-    
+
     print(f'будет обработана папка {path_str}')
-    print('в ходе обработки файлы будут отсортированы по новым папкам, кирилические символы ')
+    print('в ходе обработки файлы будут отсортированы по новым папкам, кирилические символы в названиях')
     print('будут заменены на латиницу, старая структура папок внутри указанной Вами будет уничтожена')
     if input('для продолжения работы скрипта подтвердите действие (y/n): ') == 'y':
         path = Path(path_str)
@@ -169,3 +168,7 @@ if __name__ == '__main__':
         else:
             print(f'path {path.absolute()} not exist')
     print('работа скрипта завершена')
+
+
+if __name__ == '__main__':
+    main()
