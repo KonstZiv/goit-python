@@ -1,11 +1,16 @@
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from pathlib import Path
 import pickle
 import sys
 
 
 def congratulate(users):
-    pass
+    # определяю объект datatime на следующей неделе
+    next_week = date.today() + timedelta(weeks=1)
+    # получаю список словарей, в которые включаются элементы из списка users, если при замене года на
+    bithdays_list = [elem for elem in users if elem['bithday'].replace(
+        year=next_week.year).isocalendar()[1] == next_week.isocalendar()[1]]
+    return bithdays_list
 
 
 def users_list_make(users_in):
@@ -92,6 +97,8 @@ def main():
     users = users_list_make(users_in)
     print(users)
     serialize_users(users, path=path_file)
+
+    print(congratulate(users))
 
 
 if __name__ == '__main__':
