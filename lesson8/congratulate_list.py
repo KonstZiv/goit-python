@@ -19,25 +19,25 @@ def users_list_make(users_in):
     name_scoup = set()
     print('рабочий файл: ', users_out)
     for elem in users_out:
-        for el in elem.keys():
-            name_scoup.add(el)
+        name_scoup.add(elem['name'])
         print('name_scoup: ', name_scoup)
 
     print('ввод пустой строки вместо имени или даты рождения- останавливает ввод данных')
     while True:
-        key = input('Введите имя:  ')
-        if key in name_scoup:
+        name = input('Введите имя:  ')
+        if name in name_scoup:
             print('Tакое имя уже есть в Вашем списке.')
             continue
-        if key:
+        if name:
             bithday_str = input(
                 'Введите дату рождения в формате: ДД-ММ-ГГГГ:  ')
             try:
                 if bithday_str:
                     bithday_date = datetime.strptime(
                         bithday_str, '%d-%m-%Y').date()
-                    users_out.append({key: bithday_date})
-                    name_scoup.add(key)
+                    users_out.append({'name': name, 'bithday': bithday_date})
+                    name_scoup.add(name)
+                    count += 1
 
                 else:
                     break
