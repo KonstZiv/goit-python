@@ -1,28 +1,63 @@
-from datetime import datetime, timedelta, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 import pickle
 import sys
 
 
 def congratulate(users):
-    # определяю объект datatime на следующей неделе
-    next_week = date.today() + timedelta(weeks=1)
-    # получаю список словарей, в которые включаются элементы из списка users, если при замене года на
-    bithdays_list = [elem for elem in users if elem['bithday'].replace(
-        year=next_week.year).isocalendar()[1] == next_week.isocalendar()[1]]
-    return bithdays_list
+    # итоговый список
+    result_list = [['Monday'],
+                   ['Tuesday'],
+                   ['Wednesday'],
+                   ['Thursday'],
+                   ['Friday']]
+    day_today = date.today()
+    analyzed_day = day_today
+
+    while True:
+        if (analyzed_day.isoweekday() in {6, 7}) or (analyzed_day.isoweekday() == 1 and analyzed_day.isocalendar().week == (day_today + timedelta(days=7)).isocalendar().week):
+            for elem in users:
+                if (elem['bithday'].day == analyzed_day.day) and (elem['bithday'].month == analyzed_day.month):
+                    result_list[0].append(elem['name'])
+        elif analyzed_day.isoweekday() == 2 and analyzed_day.isocalendar().week == (day_today + timedelta(days=7)).isocalendar().week:
+            for elem in users:
+                if (elem['bithday'].day == analyzed_day.day) and (elem['bithday'].month == analyzed_day.month):
+                    result_list[1].append(elem['name'])
+        elif analyzed_day.isoweekday() == 3 and analyzed_day.isocalendar().week == (day_today + timedelta(days=7)).isocalendar().week:
+            for elem in users:
+                if (elem['bithday'].day == analyzed_day.day) and (elem['bithday'].month == analyzed_day.month):
+                    result_list[2].append(elem['name'])
+        elif analyzed_day.isoweekday() == 4 and analyzed_day.isocalendar().week == (day_today + timedelta(days=7)).isocalendar().week:
+            for elem in users:
+                if (elem['bithday'].day == analyzed_day.day) and (elem['bithday'].month == analyzed_day.month):
+                    result_list[3].append(elem['name'])
+        elif analyzed_day.isoweekday() == 5 and analyzed_day.isocalendar().week == (day_today + timedelta(days=7)).isocalendar().week:
+            for elem in users:
+                if (elem['bithday'].day == analyzed_day.day) and (elem['bithday'].month == analyzed_day.month):
+                    result_list[4].append(elem['name'])
+
+        analyzed_day = analyzed_day + timedelta(days=1)
+        if analyzed_day.isocalendar().week == (day_today + timedelta(days=14)).isocalendar().week:
+            break
+
+    # печать результата в требуемой форме
+    for elem in result_list:
+        string = elem[0] + ':   '
+        for el in elem[1:]:
+            string = string + el + ', '
+        print(string)
 
 
 def users_list_make(users_in):
     """принимает на вход список словарей с именами и датами рождения (имя - str, ключ словаря,
-     значение дата рождения - объект datatime), позволяет ввести новые имена и даты рождения. 
-     Возвращает расширенный список словарей введенными именами с датами рожденияв том же формате. 
+     значение дата рождения - объект datatime), позволяет ввести новые имена и даты рождения.
+     Возвращает расширенный список словарей введенными именами с датами рожденияв том же формате.
      При вводе контролирует уникальность имен."""
 
     users_out = users_in
     count = 0
     name_scoup = set()
-    print('рабочий файл: ', users_out)
+    #print('рабочий файл: ', users_out)
     for elem in users_out:
         name_scoup.add(elem['name'])
         print('name_scoup: ', name_scoup)
@@ -67,7 +102,7 @@ def deserialize_users(path):
     with open(path, "rb") as fh:
         users = pickle.load(fh)
 
-    print('файл прочитан')
+    #print('файл прочитан')
     return users
 
 
@@ -77,7 +112,7 @@ def serialize_users(users, path):
     with open(path, "wb") as fh:
         pickle.dump(users, fh)
 
-    print(f'данные сохранены в файл {path}')
+    #print(f'данные сохранены в файл {path}')
 
 
 def main():
@@ -94,11 +129,10 @@ def main():
         path_file = Path(path) / name
         users_in = deserialize_users(path_file)
 
-    users = users_list_make(users_in)
-    print(users)
-    serialize_users(users, path=path_file)
-
-    print(congratulate(users))
+    #users = users_list_make(users_in)
+    # print(users)
+    #serialize_users(users, path=path_file)
+    congratulate(users_in)
 
 
 if __name__ == '__main__':
