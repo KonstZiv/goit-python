@@ -77,7 +77,7 @@ def parse(input_string):  # --> ('key word', parameter)
 
         def result(src):
             if src.casefold().startswith(word.casefold()):
-                return word, parse_phone(src[l:].lstrip())[0], parse_phone(src[l:].lstrip())[1]
+                return word, *parse_phone(src[l:].lstrip())
 
         return result
 
@@ -189,7 +189,7 @@ def main():
         # получить строку выделить комaнду и параметр. Если результат неопределенный\
         #  - вернуть сообщение об ошибке в параметре
         res_pars = parse(input_string)
-        print(res_pars)
+        # print(res_pars)
         # вызывает обработчик, выполняет команду. Возвращает сообщение (или об ошибке, или требуемое)
         result = get_handler(res_pars, contacts)
         if not result:
