@@ -3,7 +3,6 @@ import sys
 import pickle
 from pathlib import Path
 
-
 CONTACTS_FILE = 'contacts.dat'
 CONTACTS_DIR = ''
 
@@ -29,18 +28,10 @@ def error_handler(func):
         try:
             result = func(*args)
             return result
-
         except Exception as message:
-
-            x = message.args
-            if x[0] == 'this name is already in the contact list':
-                return 'this name is already in the contact list'
-            elif x[0] == 'this name is not in the contact list':
-                return 'this name is not in the contact list'
-
+            return message.args[0]
         except KeyError:
             return "No user with given name"
-
         except ValueError:
             return "Give me name and phone please"
         except IndexError:
@@ -93,11 +84,9 @@ def parse(input_string):  # --> ('key word', parameter)
         parse_word('.'),
         parse_word('help')
     ]
-
-    res_pars = [i(input_string) for i in parse_scoup if i(input_string)][0] if [
-        i(input_string) for i in parse_scoup if i(input_string)] else ('unrecognize', '')
-
-    return res_pars
+    res_pars = [i(input_string) for i in parse_scoup if i(
+        input_string)] or [('unrecognize', '', '')]
+    return res_pars[0]
 
 
 @error_handler
@@ -150,7 +139,7 @@ def get_handler(res_pars, contacts):
     def exit_f(name, phone, contacts):
         return None
 
-    def unrecognize_f(*args):
+    def unrecognize_f(name, phone, contacts):
         return 'incorrect input to get help enter "help"'
 
     HANDLING = {
@@ -166,7 +155,6 @@ def get_handler(res_pars, contacts):
         'unrecognize': unrecognize_f,
         'help': help_f
     }
-
     return HANDLING[res_pars[0]](res_pars[1], res_pars[2], contacts)
 
 
@@ -186,11 +174,7 @@ def main():
 
     while True:
         input_string = input('>>>  ')
-        # получить строку выделить комaнду и параметр. Если результат неопределенный\
-        #  - вернуть сообщение об ошибке в параметре
         res_pars = parse(input_string)
-        # print(res_pars)
-        # вызывает обработчик, выполняет команду. Возвращает сообщение (или об ошибке, или требуемое)
         result = get_handler(res_pars, contacts)
         if not result:
             serialize_users(contacts, path_file)
