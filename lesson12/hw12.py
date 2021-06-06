@@ -1,5 +1,6 @@
 from collections import UserDict
 from datetime import datetime, date, timedelta
+from faker import Faker
 
 
 class Phone:
@@ -131,15 +132,35 @@ class Record:
                 return self
         return False
 
-    def search_birthday(self, data_start, data_stop=False, year: bool = False):
-        # возвращает объект класса AdressBook, содержащий записи, для которых \
-        # день рождения попадает в интервал дат data_start и data_stop. \
-        # Для всех аргументов действуют те же правила, что и для метода \
-        # Birthday.search_bithday()
-        pass
-
 
 class AdressBook(UserDict):
+
+    def out_iterator(self, n):
+        '''
+        метод возвращает на каждой итерации объект класса AdressBook, 
+        содержащий n записей из вызывающего метод объекта AdressBook,
+        на последнем шаге (исчерпание записей вызывающего объекта) выводятся
+        оставшиеся записи
+        '''
+        # количество элементов выводимых за один вызов метода
+        self.n = n
+        # счетчик общего количества выведенных записей
+        self.k = 0
+        # список из ключей вызывающего метод объекта AdressBook
+        key_list = list(self)
+        # общее кличество записей, которые должны быть выведены
+        key_list_max = len(key_list)
+        while self.k < key_list_max:
+            result = AdressBook()
+            # определяем сколько записей можно вывести на текущем шаге (пна последнем шаге
+            # выводим меньше чем n)
+            max_iter = key_list_max if len(
+                key_list[self.k:]) < self.n else self.k + self.n
+            for i in range(self.k, max_iter):
+                result.add_record(self[key_list[i]])
+                self.k += 1
+            yield result
+
     def add_record(self, record: Record):
         if record.name in self:
             raise KeyError(
@@ -149,7 +170,8 @@ class AdressBook(UserDict):
     def del_record(self, name: str):
         if name in self:
             self.pop(name)
-        raise KeyError('записи с таким именем нет в адресной книге')
+        else:
+            raise KeyError('записи с таким именем нет в адресной книге')
 
     def search(self, pattern):
         result = AdressBook()
@@ -159,8 +181,34 @@ class AdressBook(UserDict):
                 result.add_record(res_rec)
         return result
 
+    def search_birthday(self, data_start, data_stop=False, year: bool = False):
+        # возвращает объект класса AdressBook, содержащий записи, для которых \
+        # день рождения попадает в интервал дат data_start и data_stop. \
+        # Для всех аргументов действуют те же правила, что и для метода \
+        # Birthday.search_bithday()
+        result = AdressBook()
+        for record in self:
+            res_rec = record.search_birthday(self, data_start, data_stop, year)
+            if res_rec:
+                result.add_record(res_rec)
+        return result
+
+    def add_fake_records(self, n):
+        fake = Faker(['uk_UA', 'en_US', 'ru_RU'])
+        for i in range(n):
+            name = fake.name()
+            phone = fake.phone_number()
+            date_of_birth = fake.date_of_birth(
+                minimum_age=10, maximum_age=115).strftime('%d-%m-%Y')
+            record = Record(name, date_of_birth).add_phone(phone)
+            self.add_record(record)
+            print(f'Добавлена запись: {name}  {date_of_birth}  {phone}')
+            print(
+                f'вид в record: {record.name}  {record.birthday.birthday:%d-%m-%Y}  {record.phones[0].phone}')
+
 
 if __name__ == '__main__':
+    '''
     name = input('input name: ')
     record = Record(name)
     record.add_birthday(input('input birthday: '))
@@ -176,3 +224,7 @@ if __name__ == '__main__':
         pattern = input('pattern: ')
         res = record.search(pattern)
         print(res)
+    '''
+    adress_book = AdressBook()
+    adress_book.add_fake_records(15)
+    print(adress_book)
