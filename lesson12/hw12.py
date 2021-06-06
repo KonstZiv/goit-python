@@ -8,6 +8,9 @@ class Phone:
         self.__phone = None
         self.phone = phone
 
+    def __eq__(self, ob) -> bool:
+        return self.phone == ob.phone
+
     @property
     def phone(self):
         return self.__phone
@@ -141,6 +144,9 @@ class AdressBook(UserDict):
             self.pop(name)
         raise KeyError('записи с таким именем нет в адресной книге')
 
+    def search(self, pattern):
+        pass
+
 
 if __name__ == '__main__':
     name = input('input name: ')
@@ -154,9 +160,5 @@ if __name__ == '__main__':
         phone = input(f'input phone {counter}: ')
     print(record)
 
-    while True:
-        data = input('data: ')
-        data_stop = input('data_stop: ')
-        print(record.search_birthday(data))
-        print(record.search_birthday(data, data_stop))
-        print(record.search_birthday(data, data_stop, year=True))
+    record.del_phone(input('input del phone: '))
+    print(record)
