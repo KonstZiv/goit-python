@@ -110,11 +110,13 @@ class AdressBook(UserDict):
         self.data[record.name.value] = record
 
     def iterator(self, n):
+        print(n)
         res = ''
         k = 0
         while k < n:
             res += next(self).value.__repr__()
             k += 1
+            print(res)
         yield res
 
 
@@ -125,23 +127,28 @@ def main():
     def convert_to_datetime(date):
         date_datetime = datetime.strptime(date, "%Y %m %d")
         return date(date_datetime.year, date_datetime.month, date_datetime.day)
+    k = 0
+    while k < 2:
 
-    name = Name(input('name: '))
-    birthday = Birthday(input('birthday, format: dd-mm-YYYY   : '))
-    record = Record(name=name, birthday=birthday)
-    count = 1
-    phone_str = input(
-        'input phones (3-16 numers, (+-() - valid symbols)): ')
-    while phone_str:
-        record.add_phone(phone_str)
-        print(f'it was phone {count}. Empty string breack input')
+        name = Name(input('name: '))
+        birthday = Birthday(input('birthday, format: dd-mm-YYYY   : '))
+        record = Record(name=name, birthday=birthday)
+        count = 1
         phone_str = input(
             'input phones (3-16 numers, (+-() - valid symbols)): ')
-        count += 1
+        while phone_str:
+            record.add_phone(phone_str)
+            print(f'it was phone {count}. Empty string breack input')
+            phone_str = input(
+                'input phones (3-16 numers, (+-() - valid symbols)): ')
+            count += 1
 
-    print(record)
+        print(record)
+        adress_book.add_record(record)
+        k += 1
 
-    print(record.__dict__)
+    while True:
+        print(adress_book.iterator(int(input("N= "))))
 
 
 if __name__ == '__main__':
