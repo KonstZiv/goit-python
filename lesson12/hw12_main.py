@@ -1,4 +1,4 @@
-from hw12 import AdressBook, Record
+from hw12 import AdressBook, Record, Phone, Birthday
 from os import name
 import sys
 import pickle
@@ -41,14 +41,14 @@ def error_handler(func):
 
 
 def parse(input_string):  # --> ('key word', parameter)
-    # extracts a command and parameters from a string, returns as a list with one \
-    # element - a tuple of two elements: commands and parameters
+    # извлекает команду и параметры из строки, возвращает в виде списка с
+    # одним элементом - кортеж из двух элементов: команды и параметры
 
     def parse_phone(src):
-        # the function takes a string as an argument and looks for a phone number in it\
-        # (on the right). Returns a tuple of two arguments - everything up to the phone \
-        # number (no spaces on the left and right) and the phone number. If the phone \
-        # number is not found, it returns an empty string instead.
+        # функция принимает строку в качестве аргумента и ищет в ней номер телефона (справа)
+        # Возвращает кортеж из двух аргументов - все, вплоть до номера телефона (без
+        # пробелов слева и справа) и номера телефона. Если номер телефона не найден,
+        # вместо него возвращается пустая строка.
 
         import re
         phone_regex = re.compile(r'[+]?[\d\-\(\)]{5,18}\s?$')
@@ -60,10 +60,10 @@ def parse(input_string):  # --> ('key word', parameter)
         return result
 
     def parse_word(word):
-        # factory function. Produces parser functions for individual commands. \
-        # Returns  a tuple from a command, the line after the command and \
-        # the phone number. If there is no phone number, an empty string \
-        # is returned instead.
+        # фабричная функция. Производит функции синтаксического анализатора для
+        # отдельных команд. Возвращает кортеж из команды, строку после команды
+        # и номер телефона. Если номер телефона отсутствует, вместо него
+        # возвращается пустая строка.
 
         l = len(word)
 
@@ -87,11 +87,15 @@ def parse(input_string):  # --> ('key word', parameter)
     ]
     res_pars = [i(input_string) for i in parse_scoup if i(
         input_string)] or [('unrecognize', '', '')]
+    print('res_pars значение:  ', res_pars[0])
     return res_pars[0]
 
 
 @error_handler
-def get_handler(res_pars, contacts):
+def get_handler(res_pars, adressbook):
+    print('внутри обработчика')
+    print(res_pars)
+    print(adressbook)
 
     def help_f(*args):
         return '''format: command parameters
@@ -107,9 +111,13 @@ def get_handler(res_pars, contacts):
 
         record = Record(name)
         record.add_phone(phone)
-        adressbook.add
+        birthday_str = input(
+            'введите день рождения в формате дд-мм-гггг ("ввод" - пропустить): ')
+        if birthday_str:
+            record.add_birthday(birthday_str)
+        adressbook.add_record(record)
 
-        return f'Contact {name} added with phone number {phone}'
+        return f'в адресную книгу внесена запись: \n{record}'
 
     def hello_f(*args):
         return 'How can I help you?'
@@ -124,11 +132,15 @@ def get_handler(res_pars, contacts):
                 old number: {old_phone}
                 new number: {phone}'''
 
-    def phone_f(name, phone, contacts):
-        if not contacts.get(name):
-            raise Exception('this name is not in the contact list')
+    def phone_f(pattern, phone, adressbook):
+        print('стартовала phone_f ')
+        print('adressbook тип данных: ', type(adressbook))
+        result = adressbook.search(pattern)
+        print(result, 'после візова')
+        if not result:
+            raise Exception('По данному запросу ничего не найдено')
 
-        return f'for contact {name} number is {contacts[name]}'
+        return result
 
     def show_all_f(name, phone, contacts):
         result = ""
@@ -155,7 +167,7 @@ def get_handler(res_pars, contacts):
         'unrecognize': unrecognize_f,
         'help': help_f
     }
-    return HANDLING[res_pars[0]](res_pars[1], res_pars[2], contacts)
+    return HANDLING[res_pars[0]](res_pars[1], res_pars[2], adressbook)
 
 
 def main():
@@ -165,6 +177,8 @@ def main():
         path_file = Path(path) / name
         adressbook = deserialize_users(
             path_file) if Path.exists(path_file) else AdressBook()
+
+        print(type(adressbook))
 
     else:
         path = sys.argv[1]
