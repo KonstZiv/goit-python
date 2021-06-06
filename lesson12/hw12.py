@@ -127,9 +127,16 @@ class Record:
         if pattern.casefold() in self.name.casefold():
             return self
         for phone in self.phones:
-            if pattern.casefold() in phone.casefold():
+            if pattern.casefold() in phone.phone.casefold():
                 return self
         return False
+
+    def search_birthday(self, data_start, data_stop=False, year: bool = False):
+        # возвращает объект класса AdressBook, содержащий записи, для которых \
+        # день рождения попадает в интервал дат data_start и data_stop. \
+        # Для всех аргументов действуют те же правила, что и для метода \
+        # Birthday.search_bithday()
+        pass
 
 
 class AdressBook(UserDict):
@@ -145,7 +152,12 @@ class AdressBook(UserDict):
         raise KeyError('записи с таким именем нет в адресной книге')
 
     def search(self, pattern):
-        pass
+        result = AdressBook()
+        for record in self:
+            res_rec = record.search(pattern)
+            if res_rec:
+                result.add_record(res_rec)
+        return result
 
 
 if __name__ == '__main__':
@@ -160,5 +172,7 @@ if __name__ == '__main__':
         phone = input(f'input phone {counter}: ')
     print(record)
 
-    record.del_phone(input('input del phone: '))
-    print(record)
+    while True:
+        pattern = input('pattern: ')
+        res = record.search(pattern)
+        print(res)
