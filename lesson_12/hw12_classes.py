@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import datetime, date, timedelta
-from Faker import Faker
+from faker import Faker
 
 
 class Phone:
@@ -219,7 +219,7 @@ class AdressBook(UserDict):
         return res
 
     def add_fake_records(self, n):
-        fake = Faker(['uk_UA', 'en_US', 'ru_RU'])
+        fake = Faker(['uk_UA', 'ru_RU'])
         for i in range(n):
             name = fake.name()
             phone = fake.phone_number()
@@ -234,25 +234,3 @@ class AdressBook(UserDict):
 
 if __name__ == '__main__':
     pass
-
-'''
-    name = input('input name: ')
-    record = Record(name)
-    record.add_birthday(input('input birthday: '))
-    counter = 1
-    phone = input(f'input phone {counter}: ')
-    while phone:
-        record.add_phone(phone)
-        counter += 1
-        phone = input(f'input phone {counter}: ')
-    print(record)
-
-    while True:
-        pattern = input('pattern: ')
-        res = record.search(pattern)
-        print(res)
-
-    adress_book = AdressBook()
-    adress_book.add_fake_records(15)
-    print(adress_book)
-'''
