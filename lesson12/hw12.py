@@ -4,12 +4,14 @@ from datetime import datetime, date, timedelta
 
 
 class Phone:
+    # класс для хранения и предварительно обработки номера телефона
 
     def __init__(self, phone):
         self.__phone = None
         self.phone = phone
 
     def __eq__(self, ob) -> bool:
+        # два объекта равны если равны строковые значения сохраненных телефонов
         return self.phone == ob.phone
 
     @property
@@ -23,13 +25,15 @@ class Phone:
             self.__phone = num
         else:
             raise ValueError(
-                'phone number can contain from 3 to 20 digits and symbols: space +-()xX.[]_')
+                'телефон при вводе может содержать от 3 до 20 цифр и символы: пробел +-()xX.[]_')
 
     def __repr__(self):
         return self.phone
 
 
 class Birthday:
+    # класс для храниения и предварительной обработки даты рождения. Данные вводятся в строковом
+    # виде и отображаются в строковом виде, хранятся в виде объекта datetime
     def __init__(self, date_str):
         self.__birthday = None
         self.birthday = datetime.strptime(date_str, "%d-%m-%Y")
@@ -52,12 +56,15 @@ class Birthday:
 
 
 class Record:
+    # класс для хранения данных об одном человеке. Тк же содержит методы обработки этой записи
     def __init__(self, name, birthday=None):
+        # обязательное поле name
         self.name = name
         self.phones = []
         self.birthday = Birthday(birthday) if birthday else None
 
     def add_phone(self, phone):
+        # добавляет номер телефона в существующую запись. Если такой номер есть - генерирует исключение
         if Phone(phone) in self.phones:
             raise ValueError(
                 'добавление телефона: такой номер уже есть в списке')
@@ -66,6 +73,8 @@ class Record:
         return self
 
     def del_phone(self, phone):
+        # удаляет телефон из записи. При попытке удалить несуществующий номер
+        # телефона - генерирует исключение
         if Phone(phone) in self.phones:
             self.phones.remove(Phone(phone))
         else:
@@ -73,6 +82,7 @@ class Record:
                 'операция удаления: такого телефона нет в данной записи')
 
     def change_phone(self, old_phone, nev_phone):
+        # замена номера телефона - удаление старого и добавление нового
         self.del_phone(old_phone)
         self.add_phone(nev_phone)
 
@@ -84,6 +94,8 @@ class Record:
         return f'Не введена дата родения для {self.name.value}'
 
     def __repr__(self):
+        # форматирует и выводит одну запись в читаемом виде одной или нескольких строк
+        # (если запись содержит несколько телефонов)
         st = f"| {self.name:.<40}| {self.birthday.__repr__(): <11} | {self.phones[0].__repr__() if self.phones else '': <20} |\n"
         if len(self.phones) > 1:
             for elem in self.phones[1:]:
@@ -91,6 +103,7 @@ class Record:
         return st
 
     def add_birthday(self, birthday):
+        # добавляет день рождения в существующую запись
         self.birthday = Birthday(birthday)
 
     def search_birthday(self, data_start, data_stop=False, year: bool = False):
@@ -162,20 +175,26 @@ class AdressBook(UserDict):
             yield result
 
     def add_record(self, record: Record):
+        # добавляет новую запись в существующую адрессную книгу.
+        # Если запись с таким ключем (именем) уже существует - генерирует исключение
         if record.name in self:
             raise KeyError(
                 'Запись с таким именем уже существует в адресной книге')
         self[record.name] = record
 
     def del_record(self, name: str):
+        # удаляет запись с ключем name (строка)
+        # из существующей адресной книги. Если такого имени нет - генерирует исключение
         if name in self:
             self.pop(name)
         else:
             raise KeyError('записи с таким именем нет в адресной книге')
 
     def search(self, pattern):
+        # возвращает объект класса AdressBook, содержащий
+        # все записи, которые при проверке методом Record.search вернут значение
         result = AdressBook()
-        for record in self:
+        for record in self.values():
             res_rec = record.search(pattern)
             if res_rec:
                 result.add_record(res_rec)
@@ -187,17 +206,17 @@ class AdressBook(UserDict):
         # Для всех аргументов действуют те же правила, что и для метода \
         # Birthday.search_bithday()
         result = AdressBook()
-        for record in self:
-            res_rec = record.search_birthday(self, data_start, data_stop, year)
+        for record in self.values():
+            res_rec = record.search_birthday(data_start, data_stop, year)
             if res_rec:
                 result.add_record(res_rec)
         return result
 
-    # def __repr__(self) -> str:
-    #    res = ''
-    #    for elem in self.values():
-    #        res += elem.__repr__()
-    #    return res
+    def __repr__(self) -> str:
+        res = ''
+        for elem in self.values():
+            res += elem.__repr__()
+        return res
 
 
 '''
