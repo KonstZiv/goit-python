@@ -1,6 +1,6 @@
 from collections import UserDict
 from datetime import datetime, date, timedelta
-#from faker import Faker
+from Faker import Faker
 
 
 class Phone:
@@ -99,7 +99,7 @@ class Record:
         st = f"| {self.name:.<40}| {self.birthday.__repr__(): <11} | {self.phones[0].__repr__() if self.phones else '': <20} |\n"
         if len(self.phones) > 1:
             for elem in self.phones[1:]:
-                st += f"|                                         |             | {elem.__repr__(): <20} |\n"
+                st += f" |                                         |             | {elem.__repr__(): <20} |\n"
         return st
 
     def add_birthday(self, birthday):
@@ -218,8 +218,6 @@ class AdressBook(UserDict):
             res += elem.__repr__()
         return res
 
-
-'''
     def add_fake_records(self, n):
         fake = Faker(['uk_UA', 'en_US', 'ru_RU'])
         for i in range(n):
@@ -232,7 +230,6 @@ class AdressBook(UserDict):
             print(f'Добавлена запись: {name}  {date_of_birth}  {phone}')
             print(
                 f'вид в record: {record.name}  {record.birthday.birthday:%d-%m-%Y}  {record.phones[0].phone}')
-'''
 
 
 if __name__ == '__main__':

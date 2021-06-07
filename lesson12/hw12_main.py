@@ -3,6 +3,7 @@ from os import name
 import sys
 import pickle
 from pathlib import Path
+from faker import Faker
 
 CONTACTS_FILE = 'contacts.dat'
 CONTACTS_DIR = ''
@@ -83,19 +84,19 @@ def parse(input_string):  # --> ('key word', parameter)
         parse_word('close'),
         parse_word('good bye'),
         parse_word('.'),
-        parse_word('help')
+        parse_word('help'),
+        parse_word('search'),
+        parse_word('other phone'),
+        parse_word('bd add')
     ]
     res_pars = [i(input_string) for i in parse_scoup if i(
         input_string)] or [('unrecognize', '', '')]
-    print('res_pars значение:  ', res_pars[0])
+
     return res_pars[0]
 
 
 @error_handler
 def get_handler(res_pars, adressbook):
-    print('внутри обработчика')
-    print(res_pars)
-    print(adressbook)
 
     def help_f(*args):
         return '''format: command parameters
@@ -133,26 +134,42 @@ def get_handler(res_pars, adressbook):
                 new number: {phone}'''
 
     def phone_f(pattern, phone, adressbook):
-        print('стартовала phone_f ')
-        print('adressbook тип данных: ', type(adressbook))
+
         result = adressbook.search(pattern)
-        print(result, 'после візова')
+
         if not result:
             raise Exception('По данному запросу ничего не найдено')
 
         return result
 
-    def show_all_f(name, phone, contacts):
-        result = ""
-        for name, phone in contacts.items():
-            result += f"{name}:   {phone}\n"
-        return result
+    def show_all_f(N, phone, adressbook):
+        n = int(N) if N else 10
+        print(f'всего к выводу {len(adressbook)} записей: ')
+        for block in adressbook.out_iterator(n):
+            print(block)
+            print('---------------------------------------------------------------------------------------------------')
+            input('для продолжения вывода нажмите "ввод"')
+        return 'вывод окончен'
 
     def exit_f(name, phone, contacts):
         return None
 
     def unrecognize_f(name, phone, contacts):
-        return 'incorrect input to get help enter "help"'
+        return 'ввод не распознан. Для получения помощи введите "help"'
+
+    def add_phone(name, phone, adressbook):
+        if name in adressbook:
+            adressbook[name].add_phone(phone)
+        else:
+            return f'имени {name} нет в адресной книге'
+        return f'в запись добавлен новый телефон: \n {adressbook[name]}'
+
+    def bd_add_f(name, birthday_str, adressbook):
+        if name in adressbook:
+            adressbook[name].add_birthday(birthday_str)
+        else:
+            return f'имени {name} нет в адресной книге'
+        return f'в запись добавлена дата рождения: \n {adressbook[name]}'
 
     HANDLING = {
         'hello': hello_f,
@@ -163,9 +180,12 @@ def get_handler(res_pars, adressbook):
         'add': add_f,
         'show all': show_all_f,
         'phone': phone_f,
+        'search': phone_f,
         'change': change_f,
         'unrecognize': unrecognize_f,
-        'help': help_f
+        'help': help_f,
+        'other phone': add_phone,
+        'bd add': bd_add_f
     }
     return HANDLING[res_pars[0]](res_pars[1], res_pars[2], adressbook)
 
@@ -178,8 +198,6 @@ def main():
         adressbook = deserialize_users(
             path_file) if Path.exists(path_file) else AdressBook()
 
-        print(type(adressbook))
-
     else:
         path = sys.argv[1]
         name = CONTACTS_FILE
@@ -187,6 +205,7 @@ def main():
         adressbook = deserialize_users(path_file)
 
     while True:
+        adressbook.add_fake_records(20)
         input_string = input('>>>  ')
         res_pars = parse(input_string)
         result = get_handler(res_pars, adressbook)
